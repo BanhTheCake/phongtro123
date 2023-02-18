@@ -1,0 +1,22 @@
+INSERT INTO categories (code, value, slug, header, subheader, createdAt, updatedAt) VALUES ("CTCH", "Cho thuê căn hộ","cho-thue-can-ho","Cho Thuê Căn Hộ Chung Cư, Giá Rẻ, Mới Nhất 2022", "Cho thuê căn hộ - Kênh đăng tin cho thuê căn hộ số 1: giá rẻ, chính chủ, đầy đủ tiện nghi. Cho thuê chung cư với nhiều mức giá, diện tích cho thuê khác nhau.", current_timestamp, current_timestamp);
+INSERT INTO categories (code, value, slug, header, subheader, createdAt, updatedAt) VALUES ("CTMB", "Cho thuê mặt bằng","cho-thue-mat-bang","Cho Thuê Mặt Bằng, Cho Thuê Văn Phòng, Cửa Hàng, Kiot, Mới Nhất 2022", "Cho thuê mặt bằng - Kênh đăng tin cho thuê mặt bằng, cho thuê cửa hàng, cho thuê kiot số 1: giá rẻ, mặt tiền, khu đông dân cư, phù hợp kinh doanh.", current_timestamp, current_timestamp);
+INSERT INTO categories (code, value, slug, header, subheader, createdAt, updatedAt) VALUES ("CTPT","Cho thuê phòng trọ","cho-thue-phong-tro","Cho Thuê Phòng Trọ, Giá Rẻ, Tiện Nghi, Mới Nhất 2022", "Cho thuê phòng trọ - Kênh thông tin số 1 về phòng trọ giá rẻ, phòng trọ sinh viên, phòng trọ cao cấp mới nhất năm 2022. Tất cả nhà trọ cho thuê giá tốt nhất tại Việt Nam.", current_timestamp, current_timestamp);
+INSERT INTO categories (code, value, slug, header, subheader, createdAt, updatedAt) VALUES ("NCT", "Nhà cho thuê","nha-cho-thue","Cho Thuê Nhà Nguyên Căn, Giá Rẻ, Chính Chủ, Mới Nhất 2022", "Cho thuê nhà nguyên căn - Kênh đăng tin cho thuê nhà số 1: giá rẻ, chính chủ, miễn trung gian, đầy đủ tiện nghi, mức giá, diện tích cho thuê khác nhau.", current_timestamp, current_timestamp);
+
+
+INSERT INTO prices (fromValue, toValue, value, createdAt, updatedAt) VALUES (0, 1000000, "Dưới 1 triệu", current_timestamp, current_timestamp);
+INSERT INTO prices (fromValue, toValue, value, createdAt, updatedAt) VALUES (1000000, 2000000, "Từ 1 - 2 triệu", current_timestamp, current_timestamp);
+INSERT INTO prices (fromValue, toValue, value, createdAt, updatedAt) VALUES (2000000, 3000000, "Từ 2 - 3 triệu", current_timestamp, current_timestamp);
+INSERT INTO prices (fromValue, toValue, value, createdAt, updatedAt) VALUES (3000000, 5000000, "Từ 3 - 5 triệu", current_timestamp, current_timestamp);
+INSERT INTO prices (fromValue, toValue, value, createdAt, updatedAt) VALUES (5000000, 7000000, "Từ 5 - 7 triệu", current_timestamp, current_timestamp);
+INSERT INTO prices (fromValue, toValue, value, createdAt, updatedAt) VALUES (7000000, 10000000, "Từ 7 - 10 triệu", current_timestamp, current_timestamp);
+INSERT INTO prices (fromValue, toValue, value, createdAt, updatedAt) VALUES (10000000, 15000000, "Từ 10 - 15 triệu", current_timestamp, current_timestamp);
+INSERT INTO prices (fromValue, toValue, value, createdAt, updatedAt) VALUES (15000000, null, "Trên 15 triệu", current_timestamp, current_timestamp);
+
+
+INSERT INTO areas (fromValue, toValue, value, createdAt, updatedAt) VALUES (0, 20, "Dưới 20m", current_timestamp, current_timestamp);
+INSERT INTO areas (fromValue, toValue, value, createdAt, updatedAt) VALUES (20, 30, "Từ 20 - 30m", current_timestamp, current_timestamp);
+INSERT INTO areas (fromValue, toValue, value, createdAt, updatedAt) VALUES (30, 50, "Từ 30 - 50m", current_timestamp, current_timestamp);
+INSERT INTO areas (fromValue, toValue, value, createdAt, updatedAt) VALUES (50, 70, "Từ 50 - 70m", current_timestamp, current_timestamp);
+INSERT INTO areas (fromValue, toValue, value, createdAt, updatedAt) VALUES (70, 90, "Từ 70 - 90m", current_timestamp, current_timestamp);
+INSERT INTO areas (fromValue, toValue, value, createdAt, updatedAt) VALUES (90, null, "Trên 90m", current_timestamp, current_timestamp);

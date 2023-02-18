@@ -1,0 +1,9 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+.swiper-pagination {
+    color: white !important;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px black;
+}
