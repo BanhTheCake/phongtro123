@@ -18,14 +18,11 @@ const routesAuth = [PATH.SYSTEM];
 const PersistLayout = ({ children }: IAuthLayout) => {
     const token = useSelector<RootState>((state) => state.auth.token)
     const user = useSelector<RootState>((state) => state.auth.user);
-    const [isLoading, setIsLoading] = useState(true)
 
     const router = useRouter();
     const dispatch = useDispatch();
 
-    const isAuth = routesAuth.some((routes) =>
-        router.pathname.includes(routes)
-    );
+    const firstMount = useRef(true)
 
     useQuery(
         'Get Current User',
@@ -36,13 +33,10 @@ const PersistLayout = ({ children }: IAuthLayout) => {
             onSuccess: (data) => {
                 dispatch(setStateData({ user: data, isLogin: true }));
             },
-            onError: (err) => {
+            onError: (_) => {
                 logout(() => {
                     router.push(PATH.LOGIN);
                 });
-            },
-            onSettled: () => {
-                setIsLoading(false)
             }
         }
     );
@@ -52,13 +46,14 @@ const PersistLayout = ({ children }: IAuthLayout) => {
             try {
                 await refreshToken();
             } catch (error) {
-                setIsLoading(false)
+                console.log(error);
             }
         };
-        handleGetToken();
+        firstMount.current && handleGetToken();
+        return () => {
+            firstMount.current = false
+        }
     }, []);
-
-    if (isAuth && isLoading) return null
     return <>{children}</>;
 };
 

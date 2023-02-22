@@ -1,9 +1,10 @@
 import { ConfigService } from '@nestjs/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { RefreshToken } from '../types/token.type';
 import { Request } from 'express';
+import { User } from 'Models/Entity/users.model';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -29,7 +30,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     return refreshToken;
   }
 
-  async validate(req: Request, payload: RefreshToken) {
+  async validate(req: Request) {
     const { refreshToken } = req.cookies;
     return { refreshToken };
   }

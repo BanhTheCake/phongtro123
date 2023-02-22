@@ -144,6 +144,7 @@ export class AuthService {
         where: { refreshToken },
       });
       if (!currentUser) {
+        res.cookie('refreshToken', '', cookieConfig);
         throw new UnauthorizedException();
       }
       const newAccessToken = this.tokenService.generateAccessToken({
@@ -158,11 +159,33 @@ export class AuthService {
       res.cookie('refreshToken', newRefreshToken, cookieConfig);
       currentUser.refreshToken = newRefreshToken;
       await currentUser.save();
-
       return {
         errCode: 0,
         msg: 'Ok',
         data: newAccessToken,
+      };
+    } catch (error) {
+      if (error.response) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Something wrong with server ! ' + error,
+      );
+    }
+  }
+
+  async checkAuth(res: Response, refreshToken: string): Promise<response> {
+    try {
+      const currentUser = await this.UserModel.findOne({
+        where: { refreshToken },
+      });
+      if (!currentUser) {
+        res.cookie('refreshToken', '', cookieConfig);
+        throw new UnauthorizedException();
+      }
+      return {
+        errCode: 0,
+        msg: 'Ok',
       };
     } catch (error) {
       if (error.response) {

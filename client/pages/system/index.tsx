@@ -22,6 +22,8 @@ import {
 import getCurrentRoute from '../../utils/helpers/getCurrentRoute';
 import Head from 'next/head';
 import PATH from '../../constants/path';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 const menu = [
   { value: 'public', label: 'Tin chưa hết hạn' },
@@ -47,6 +49,8 @@ const SystemHomePage = () => {
     isOpen: false,
     id: '',
   });
+
+  const token = useSelector<RootState>((state) => state.auth.token) as string | undefined
 
   useEffect(() => {
     if (!filterValue) return;
@@ -78,6 +82,7 @@ const SystemHomePage = () => {
         console.log('err: ' + err);
       },
       keepPreviousData: true,
+      enabled: !!token
     }
   );
 
