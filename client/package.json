@@ -10,6 +10,7 @@
     "@reduxjs/toolkit": "^1.9.1",
     "@tailwindcss/line-clamp": "^0.4.2",
     "@tippyjs/react": "^4.2.6",
+    "@vespaiach/axios-fetch-adapter": "^0.3.1",
     "axios": "^1.2.5",
     "google-map-react": "^2.2.0",
     "lodash": "^4.17.21",

@@ -46,6 +46,15 @@ export class AuthController {
     return this.AuthService.handleRefresh(res, refreshToken);
   }
 
+  @UseGuards(RefreshTokenGuard)
+  @Get('/checkAuth')
+  handleCheckAuth(
+    @User() { refreshToken }: { refreshToken: string },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.AuthService.checkAuth(res, refreshToken);
+  }
+
   @UseGuards(AccessTokenGuard)
   @Get()
   hello() {

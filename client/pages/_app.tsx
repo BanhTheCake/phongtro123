@@ -42,9 +42,9 @@ function MyApp({ Component, pageProps }: AppProps) {
                         options={{ showSpinner: false }}
                     />
                     <PersistLayout>
-                        <AuthLayout>
-                            <Component {...pageProps} />
-                        </AuthLayout>
+                        {/* <AuthLayout> */}
+                        <Component {...pageProps} />
+                        {/* </AuthLayout> */}
                     </PersistLayout>
                     <ToastContainer />
                 </Provider>
