@@ -1,6 +1,7 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+@import url('https://unpkg.com/leaflet@1.5.1/dist/leaflet.css');
 
 .swiper-pagination {
     color: white !important;

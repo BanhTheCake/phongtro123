@@ -32,6 +32,7 @@ export const GET_ALL_AREAS_URL = `${BASE_URL}/area`;
 export const GET_ALL_PROVINCE_URL = `${BASE_URL}/province/all`;
 export const GET_TOTAL_PROVINCE_URL = `https://vapi.vnappmob.com/api/province/`;
 export const GET_CURRENT_DISTRICT_URL = `https://vapi.vnappmob.com/api/province/district`;
+export const GET_COORDINATES = `http://api.positionstack.com/v1/forward`;
 
 // User
 export const GET_CURRENT_USER_URL = `${BASE_URL}/user/current`;

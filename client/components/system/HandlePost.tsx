@@ -16,6 +16,7 @@ import {
     handleUpdatePost,
 } from '../../utils/axios/post.axios';
 import {
+    getCoordinates,
     getCurrentDistrict,
     getTotalProvinces,
 } from '../../utils/axios/province.axios';
@@ -29,6 +30,7 @@ import Input from '../global/Input';
 import InputFile from '../global/InputFile';
 import InputSelect, { IInputSelectItem } from '../global/InputSelect';
 import InputTextarea from '../global/InputTextarea';
+import dynamic from 'next/dynamic';
 
 interface IHandlePostProps {
     type: 'create' | 'update';
@@ -64,6 +66,9 @@ const rules = [
 
 const HandlePost = ({ type, callback = undefined }: IHandlePostProps) => {
     const router = useRouter();
+    const Map = dynamic(() => import('../global/Map'), {
+        ssr: false,
+    });
 
     const { id: postId } = router.query;
     const isCreating = type === 'create';
@@ -76,6 +81,7 @@ const HandlePost = ({ type, callback = undefined }: IHandlePostProps) => {
     const [distinctLabelOfPost, setDistinctLabelOfPost] = useState('');
     const [dataUpdate, setDataUpdate] = useState<Partial<IHandlePost>>({});
     const [isResetData, setIsResetData] = useState(isUpdating);
+    const [queryCoordinate, setQueryCoordinate] = useState('');
 
     const { control, handleSubmit, watch, resetField, reset, setValue } =
         useForm<IHandlePost>({
@@ -113,6 +119,20 @@ const HandlePost = ({ type, callback = undefined }: IHandlePostProps) => {
             callback && callback();
         },
     });
+
+    const { data: coordinates } = useQuery(
+        ['Get Coordinates', queryCoordinate],
+        ({ signal }) => getCoordinates(signal, queryCoordinate),
+        {
+            onError: (err) => {
+                console.log('Err: ', err);
+            },
+            enabled: !!queryCoordinate,
+            onSuccess(data) {
+                console.log(data);
+            },
+        }
+    );
 
     const { data: provinces } = useQuery(
         'Get Total Provinces',
@@ -229,14 +249,14 @@ const HandlePost = ({ type, callback = undefined }: IHandlePostProps) => {
 
     const addressText = [
         provinceValue &&
-        provincesOptions &&
-        provincesOptions.find(
-            (province) => province.value === provinceValue
-        )?.label,
+            provincesOptions &&
+            provincesOptions.find(
+                (province) => province.value === provinceValue
+            )?.label,
         distinctValue &&
-        districtOptions &&
-        districtOptions.find((district) => district.value === distinctValue)
-            ?.label,
+            districtOptions &&
+            districtOptions.find((district) => district.value === distinctValue)
+                ?.label,
     ]
         .filter((item) => item)
         .join(' - ');
@@ -380,219 +400,247 @@ const HandlePost = ({ type, callback = undefined }: IHandlePostProps) => {
         setValue('phone', user.phone);
     }, [user]);
 
+    useEffect(() => {
+        const provinceLabel = provincesOptions?.find(
+            (item) => item.value === provinceValue
+        )?.label;
+        const districtLabel = districtOptions?.find(
+            (item) => item.value === distinctValue
+        )?.label;
+        const cityLabelArr = [districtLabel, provinceLabel].filter(
+            (item) => item
+        );
+        setQueryCoordinate(cityLabelArr.join(', '));
+    }, [provinceValue, distinctValue]);
+
     if (isUpdating && (isResetData || isGetUpdatePost))
-        return <div className="grid grid-cols-3 mt-3 pb-3 gap-6 animate-pulse">
-            <div className="col-span-2 space-y-8">
-                <div className="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                <div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-full mb-2.5"></div>
-                    <div className="h-8 bg-gray-200 rounded-md dark:bg-gray-700 max-w-full mb-2.5"></div>
+        return (
+            <div className="grid grid-cols-3 mt-3 pb-3 gap-6 animate-pulse">
+                <div className="col-span-2 space-y-8">
+                    <div className="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+                    <div>
+                        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-full mb-2.5"></div>
+                        <div className="h-8 bg-gray-200 rounded-md dark:bg-gray-700 max-w-full mb-2.5"></div>
+                    </div>
+                    <div>
+                        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-full mb-2.5"></div>
+                        <div className="h-8 bg-gray-200 rounded-md dark:bg-gray-700 max-w-full mb-2.5"></div>
+                    </div>
+                    <div className="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+                    <div>
+                        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-full mb-2.5"></div>
+                        <div className="h-8 bg-gray-200 rounded-md dark:bg-gray-700 max-w-full mb-2.5"></div>
+                    </div>
+                    <div>
+                        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-full mb-2.5"></div>
+                        <div className="h-8 bg-gray-200 rounded-md dark:bg-gray-700 max-w-full mb-2.5"></div>
+                    </div>
+                    <div className="h-40 bg-gray-200 rounded-md dark:bg-gray-700 mb-4 max-w-full"></div>
                 </div>
-                <div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-full mb-2.5"></div>
-                    <div className="h-8 bg-gray-200 rounded-md dark:bg-gray-700 max-w-full mb-2.5"></div>
+                <div className="col-span-1">
+                    <div className="h-80 bg-gray-200 rounded-md dark:bg-gray-700 mb-4 max-w-full"></div>
                 </div>
-                <div className="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                <div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-full mb-2.5"></div>
-                    <div className="h-8 bg-gray-200 rounded-md dark:bg-gray-700 max-w-full mb-2.5"></div>
-                </div>
-                <div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-full mb-2.5"></div>
-                    <div className="h-8 bg-gray-200 rounded-md dark:bg-gray-700 max-w-full mb-2.5"></div>
-                </div>
-                <div className="h-40 bg-gray-200 rounded-md dark:bg-gray-700 mb-4 max-w-full"></div>
             </div>
-            <div className="col-span-1">
-                <div className="h-80 bg-gray-200 rounded-md dark:bg-gray-700 mb-4 max-w-full"></div>
-            </div>
-        </div>;
+        );
 
     return (
-        <div className="grid grid-cols-3 mt-3 pb-3 gap-6">
-            <form
-                className="col-span-2 space-y-8"
-                onSubmit={handleSubmit(
-                    type === 'create' ? onSubmitCreate : onSubmitUpdate
-                )}
-            >
-                <div className="space-y-4">
-                    <h3 className="text-xl font-semibold mb-6">
-                        Địa chỉ cho thuê
-                    </h3>
-                    <div className="grid grid-cols-2 gap-3">
-                        <InputSelect
-                            name="province"
-                            control={control}
-                            defaultValue={initData['province']}
-                            placeholder={'-- Chọn Tỉnh/Thành phố --'}
-                            text={'Tỉnh/Thành phố'}
-                            options={provincesOptions}
-                        />
-                        <InputSelect
-                            name="distinct"
-                            control={control}
-                            defaultValue={initData['distinct']}
-                            placeholder={'-- Chọn Quận/Huyện --'}
-                            text={'Quận/Huyện'}
-                            options={districtOptions}
-                        />
-                    </div>
-                    <div className="">
-                        <label className="mb-1.5 font-semibold pl-1 flex">
-                            Địa chỉ chính xác
-                        </label>
-                        <div className="w-full h-[38px] rounded-md bg-slate-200 flex items-center px-3">
-                            {addressText}
-                        </div>
-                    </div>
-                </div>
-                <div className="space-y-4">
-                    <h3 className="text-xl font-semibold mb-6">
-                        Thông tin mô tả
-                    </h3>
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="col-span-1">
-                            <InputSelect
-                                name="category"
-                                control={control}
-                                defaultValue={initData['category']}
-                                placeholder={'-- Chọn loại chuyên mục --'}
-                                text={'Loại chuyên mục'}
-                                options={slugsOptions}
-                            />
-                        </div>
-                        <div className="col-span-2">
-                            <Input
-                                control={control}
-                                name="title"
-                                text="Tiêu đề"
-                                placeholder=""
-                                id="title"
-                                defaultValue={initData['title']}
-                                type={'text'}
-                                sizeInput="s"
-                            />
-                        </div>
-                        <div className="col-span-2">
-                            <InputTextarea
-                                control={control}
-                                name="description"
-                                text="Nội dung"
-                                placeholder="Write your description here..."
-                                id="description"
-                                defaultValue={initData['description']}
-                                minRows={6}
-                                maxRows={12}
-                            />
-                        </div>
-                        <div className="col-span-2">
-                            <Input
-                                control={control}
-                                name="username"
-                                text="Thông tin liên hệ"
-                                placeholder=""
-                                id="username"
-                                defaultValue={initData['username']}
-                                type={'text'}
-                                sizeInput="s"
-                                disabled
-                            />
-                        </div>
-                        <div className="col-span-2">
-                            <Input
-                                control={control}
-                                name="phone"
-                                text="Điện thoại"
-                                placeholder=""
-                                id="phone"
-                                defaultValue={initData['phone']}
-                                type={'text'}
-                                sizeInput="s"
-                                disabled
-                            />
-                        </div>
-                        <div className="col-span-2">
-                            <Input
-                                control={control}
-                                name="price"
-                                text="Giá cho thuê (đồng)"
-                                placeholder=""
-                                id="price"
-                                defaultValue={initData['price']}
-                                type={'text'}
-                                sizeInput="s"
-                            />
-                        </div>
-                        <div className="col-span-2">
-                            <Input
-                                control={control}
-                                name="area"
-                                text="Diện tích (m2)"
-                                placeholder=""
-                                id="area"
-                                defaultValue={initData['area']}
-                                type={'text'}
-                                sizeInput="s"
-                            />
-                        </div>
-                        <div className="col-span-1">
-                            <InputSelect
-                                name="gender"
-                                control={control}
-                                defaultValue={initData['gender']}
-                                placeholder={'-- Chọn đối tượng --'}
-                                text={'Đối tượng'}
-                                options={targetOptions}
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="space-y-4">
-                    <h3 className="text-xl font-semibold">Hình ảnh</h3>
-                    <p>Cập nhật hình ảnh rõ ràng sẽ cho thuê nhanh hơn</p>
-                    <div className="grid grid-cols-1">
-                        <div className="col-span-2">
-                            <InputFile
-                                name="images"
-                                control={control}
-                                text="Thêm ảnh"
-                                id="file"
-                                multiple
-                            />
-                        </div>
-                    </div>
-                </div>
-                <button
-                    className={`w-full bg-green-600 text-white font-semibold p-2 rounded-sm ${isCreateLoading || isUpdateLoading
-                        ? 'opacity-80 cursor-not-allowed'
-                        : ''
-                        }`}
-                >
-                    {isCreating ? (
-                        <>{isCreateLoading ? 'Đang tạo ...' : 'Tiếp tục'}</>
-                    ) : (
-                        <>
-                            {isUpdateLoading
-                                ? 'Đang cập nhật ...'
-                                : 'Chỉnh sửa'}
-                        </>
+        <>
+            <div className="grid grid-cols-3 mt-3 pb-3 gap-6">
+                <form
+                    className="col-span-2 space-y-8"
+                    onSubmit={handleSubmit(
+                        type === 'create' ? onSubmitCreate : onSubmitUpdate
                     )}
-                </button>
-            </form>
-            <div className="col-span-1">
-                <div className='bg-[#fff3cd] border border-[#ffeeba] text-[#856404] shadow-low rounded-md p-4 '>
-                    <h4 className='text-xl font-semibold pb-2'>Lưu ý khi đăng tin</h4>
-                    <ul className='list-disc pl-4 space-y-1.5 text-sm'>
-                        {rules.map((rule, index) => {
-                            return <li key={index + rule}>
-                                {rule}
-                            </li>
-                        })}
-                    </ul>
+                >
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-semibold mb-6">
+                            Địa chỉ cho thuê
+                        </h3>
+                        <div className="grid grid-cols-2 gap-3">
+                            <InputSelect
+                                name="province"
+                                control={control}
+                                defaultValue={initData['province']}
+                                placeholder={'-- Chọn Tỉnh/Thành phố --'}
+                                text={'Tỉnh/Thành phố'}
+                                options={provincesOptions}
+                            />
+                            <InputSelect
+                                name="distinct"
+                                control={control}
+                                defaultValue={initData['distinct']}
+                                placeholder={'-- Chọn Quận/Huyện --'}
+                                text={'Quận/Huyện'}
+                                options={districtOptions}
+                            />
+                        </div>
+                        <div className="">
+                            <label className="mb-1.5 font-semibold pl-1 flex">
+                                Địa chỉ chính xác
+                            </label>
+                            <div className="w-full h-[38px] rounded-md bg-slate-200 flex items-center px-3">
+                                {addressText}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-semibold mb-6">
+                            Thông tin mô tả
+                        </h3>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="col-span-1">
+                                <InputSelect
+                                    name="category"
+                                    control={control}
+                                    defaultValue={initData['category']}
+                                    placeholder={'-- Chọn loại chuyên mục --'}
+                                    text={'Loại chuyên mục'}
+                                    options={slugsOptions}
+                                />
+                            </div>
+                            <div className="col-span-2">
+                                <Input
+                                    control={control}
+                                    name="title"
+                                    text="Tiêu đề"
+                                    placeholder=""
+                                    id="title"
+                                    defaultValue={initData['title']}
+                                    type={'text'}
+                                    sizeInput="s"
+                                />
+                            </div>
+                            <div className="col-span-2">
+                                <InputTextarea
+                                    control={control}
+                                    name="description"
+                                    text="Nội dung"
+                                    placeholder="Write your description here..."
+                                    id="description"
+                                    defaultValue={initData['description']}
+                                    minRows={6}
+                                    maxRows={12}
+                                />
+                            </div>
+                            <div className="col-span-2">
+                                <Input
+                                    control={control}
+                                    name="username"
+                                    text="Thông tin liên hệ"
+                                    placeholder=""
+                                    id="username"
+                                    defaultValue={initData['username']}
+                                    type={'text'}
+                                    sizeInput="s"
+                                    disabled
+                                />
+                            </div>
+                            <div className="col-span-2">
+                                <Input
+                                    control={control}
+                                    name="phone"
+                                    text="Điện thoại"
+                                    placeholder=""
+                                    id="phone"
+                                    defaultValue={initData['phone']}
+                                    type={'text'}
+                                    sizeInput="s"
+                                    disabled
+                                />
+                            </div>
+                            <div className="col-span-2">
+                                <Input
+                                    control={control}
+                                    name="price"
+                                    text="Giá cho thuê (đồng)"
+                                    placeholder=""
+                                    id="price"
+                                    defaultValue={initData['price']}
+                                    type={'text'}
+                                    sizeInput="s"
+                                />
+                            </div>
+                            <div className="col-span-2">
+                                <Input
+                                    control={control}
+                                    name="area"
+                                    text="Diện tích (m2)"
+                                    placeholder=""
+                                    id="area"
+                                    defaultValue={initData['area']}
+                                    type={'text'}
+                                    sizeInput="s"
+                                />
+                            </div>
+                            <div className="col-span-1">
+                                <InputSelect
+                                    name="gender"
+                                    control={control}
+                                    defaultValue={initData['gender']}
+                                    placeholder={'-- Chọn đối tượng --'}
+                                    text={'Đối tượng'}
+                                    options={targetOptions}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-semibold">Hình ảnh</h3>
+                        <p>Cập nhật hình ảnh rõ ràng sẽ cho thuê nhanh hơn</p>
+                        <div className="grid grid-cols-1">
+                            <div className="col-span-2">
+                                <InputFile
+                                    name="images"
+                                    control={control}
+                                    text="Thêm ảnh"
+                                    id="file"
+                                    multiple
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <button
+                        className={`w-full bg-green-600 text-white font-semibold p-2 rounded-sm ${
+                            isCreateLoading || isUpdateLoading
+                                ? 'opacity-80 cursor-not-allowed'
+                                : ''
+                        }`}
+                    >
+                        {isCreating ? (
+                            <>{isCreateLoading ? 'Đang tạo ...' : 'Tiếp tục'}</>
+                        ) : (
+                            <>
+                                {isUpdateLoading
+                                    ? 'Đang cập nhật ...'
+                                    : 'Chỉnh sửa'}
+                            </>
+                        )}
+                    </button>
+                </form>
+                <div className="col-span-1">
+                    {coordinates && (
+                        <div className="w-full h-[300px] overflow-hidden mb-4 rounded-sm">
+                            <Map
+                                position={[
+                                    coordinates[0]?.latitude || 0,
+                                    coordinates[0]?.longitude || 0,
+                                ]}
+                            />
+                        </div>
+                    )}
+                    <div className="bg-[#fff3cd] border border-[#ffeeba] text-[#856404] shadow-low rounded-md p-4 ">
+                        <h4 className="text-xl font-semibold pb-2">
+                            Lưu ý khi đăng tin
+                        </h4>
+                        <ul className="list-disc pl-4 space-y-1.5 text-sm">
+                            {rules.map((rule, index) => {
+                                return <li key={index + rule}>{rule}</li>;
+                            })}
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

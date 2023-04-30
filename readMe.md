@@ -40,8 +40,6 @@
 
 ![text](./preview-img/DetailsPost-1.png)
 
-![text](./preview-img/DetailsPost-2.png)
-
 -   Manage posts
 
 ![text](./preview-img/ManagePosts.png)

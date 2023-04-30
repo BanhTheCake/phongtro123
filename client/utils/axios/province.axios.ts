@@ -1,11 +1,13 @@
 import {
     IGetTotalProvince,
     IGetCurrentDistrict,
+    IGetCoordinate,
 } from './../interfaces/province.interface';
 import {
     GET_ALL_PROVINCE_URL,
     GET_TOTAL_PROVINCE_URL,
     GET_CURRENT_DISTRICT_URL,
+    GET_COORDINATES,
 } from './../../constants/api';
 import axios, { AxiosError } from 'axios';
 import { IGetAllProvince } from '../interfaces/province.interface';
@@ -62,6 +64,30 @@ export const getCurrentDistrict = (
             });
             const resData = res.data as { results: IGetCurrentDistrict[] };
             resolve(resData.results);
+        } catch (error) {
+            const errT = error as AxiosError;
+            reject(errT.message);
+        }
+    });
+};
+
+export const getCoordinates = (
+    signal: AbortSignal | undefined,
+    query: string
+) => {
+    return new Promise<IGetCoordinate[]>(async (resolve, reject) => {
+        try {
+            const res = await axios({
+                method: 'get',
+                url: `${GET_COORDINATES}`,
+                signal,
+                params: {
+                    access_key: process.env.NEXT_PUBLIC_MAP_KEY,
+                    query,
+                },
+            });
+            const resData = res.data as { data: IGetCoordinate[] };
+            resolve(resData.data);
         } catch (error) {
             const errT = error as AxiosError;
             reject(errT.message);

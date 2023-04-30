@@ -4,7 +4,7 @@ import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { AiOutlineClockCircle } from 'react-icons/ai';
 import { BsTextareaResize } from 'react-icons/bs';
 import { HiOutlineHashtag } from 'react-icons/hi';
@@ -23,16 +23,37 @@ import { getAllAreas } from '../../utils/axios/area.axios';
 import { getAllSlugs } from '../../utils/axios/category.axios';
 import {
     getAllPostsPagination,
-    handleGetDetailsPost
+    handleGetDetailsPost,
 } from '../../utils/axios/post.axios';
 import { getAllPrices } from '../../utils/axios/price.axios';
 import formatAmount from '../../utils/helpers/formatAmount';
 import formatDate from '../../utils/helpers/formatDate';
 import { IDetailsPost } from '../../utils/interfaces/post.interface';
+import { getCoordinates } from '../../utils/axios/province.axios';
+import dynamic from 'next/dynamic';
 
 const DetailsPost = () => {
     const router = useRouter();
     const [title, postId] = (router.query['detailsPost'] as string[]) || [];
+    const [queryCoordinate, setQueryCoordinate] = useState('');
+
+    const Map = dynamic(() => import('../../components/global/Map'), {
+        ssr: false,
+    });
+
+    const { data: coordinates } = useQuery(
+        ['Get Coordinates', queryCoordinate],
+        ({ signal }) => getCoordinates(signal, queryCoordinate),
+        {
+            onError: (err) => {
+                console.log('Err: ', err);
+            },
+            enabled: !!queryCoordinate,
+            onSuccess(data) {
+                console.log(data);
+            },
+        }
+    );
 
     const { data: post } = useQuery(
         ['Get Details Post', postId],
@@ -42,6 +63,17 @@ const DetailsPost = () => {
                 console.log('err: ', err);
             },
             enabled: !!postId,
+            onSuccess(data) {
+                console.log(data);
+                const addressArr = data.address.split(', ');
+                const addressArrLength = addressArr.length;
+                setQueryCoordinate(
+                    [
+                        addressArr?.[addressArrLength - 1],
+                        addressArr?.[addressArrLength - 2],
+                    ].join(', ')
+                );
+            },
         }
     );
 
@@ -260,6 +292,26 @@ const DetailsPost = () => {
                                             </div>
                                         </div>
                                     </div>
+                                    {coordinates && (
+                                        <>
+                                            <div className="pt-3">
+                                                <h3 className="text-2xl font-semibold">
+                                                    Bản đồ
+                                                </h3>
+                                                <div className="w-full h-[300px] overflow-hidden rounded-sm mt-4">
+                                                    <Map
+                                                        position={[
+                                                            coordinates[0]
+                                                                ?.latitude || 0,
+                                                            coordinates[0]
+                                                                ?.longitude ||
+                                                                0,
+                                                        ]}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
                                     <p className="text-slate-500 pt-2">
                                         {`Bạn đang xem nội dung tin đăng: "${[
                                             post.overview.area,
@@ -330,9 +382,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     const queries = data
         ? {
-            category: data.category.slug,
-            province: data.province.code,
-        }
+              category: data.category.slug,
+              province: data.province.code,
+          }
         : {};
     const page = 1;
     await queryClient.prefetchQuery(

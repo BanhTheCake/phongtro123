@@ -15,7 +15,6 @@ import SearchItem from './SearchItem';
 import SearchModal, { IItem } from './SearchModal';
 import SearchModalSlider, { IItemSlider } from './SearchModalSlider';
 
-
 interface Menu<T> {
     type: keyof typeof initData;
     data: T;
@@ -30,7 +29,6 @@ const initData = {
     price: { fromValue: null, toValue: null, value: '' },
     area: { fromValue: null, toValue: null, value: '' },
 };
-
 
 const Search = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -63,9 +61,7 @@ const Search = () => {
         };
     };
 
-    const handleReset = (
-        key: keyof typeof initData
-    ) => {
+    const handleReset = (key: keyof typeof initData) => {
         return () => {
             setAllValue((prev) => ({ ...prev, [key]: initData[key] }));
             setIsOpen(false);
@@ -168,12 +164,20 @@ const Search = () => {
 
     const router = useRouter();
     useEffect(() => {
-        const { category: slug, minArea, maxArea, minPrice, maxPrice, province } = router.query;
+        const {
+            category: slug,
+            minArea,
+            maxArea,
+            minPrice,
+            maxPrice,
+            province,
+        } = router.query;
         setAllValue(initData);
 
         if (slug && categories) {
             const currentCategory =
-                categories.find((category) => category.slug === slug) || initData['category'];
+                categories.find((category) => category.slug === slug) ||
+                initData['category'];
             handleChange('category')({
                 code: currentCategory.code,
                 value: currentCategory.value,
@@ -208,8 +212,9 @@ const Search = () => {
             }) || {
                 fromValue: Number(minPrice),
                 toValue: Number(maxPrice),
-                value: `Từ ${Number(minPrice) / 1_000_000} - ${Number(maxPrice) / 1_000_000
-                    } triệu`,
+                value: `Từ ${Number(minPrice) / 1_000_000} - ${
+                    Number(maxPrice) / 1_000_000
+                } triệu`,
             };
             handleChange('price')(currentPrice);
         }
@@ -221,7 +226,6 @@ const Search = () => {
                 }) || initData['province'];
             handleChange('province')(currentProvince);
         }
-
     }, [router]);
 
     const handleSubmit = useCallback(() => {
@@ -244,9 +248,9 @@ const Search = () => {
         // lấy các giá trị thoả mãn để đưa vào params
         Object.keys(queryValue).forEach((item) => {
             if (['area', 'price'].includes(item)) {
-                const capitalizeKey = item[0].toUpperCase() + item.slice(1) // ex: area => Area
-                const min = 'min' + capitalizeKey
-                const max = 'max' + capitalizeKey
+                const capitalizeKey = item[0].toUpperCase() + item.slice(1); // ex: area => Area
+                const min = 'min' + capitalizeKey;
+                const max = 'max' + capitalizeKey;
                 const { fromValue, toValue } = queryValue[item];
                 params[min] = fromValue || 0;
                 if (toValue) params[max] = toValue;
@@ -254,7 +258,9 @@ const Search = () => {
             if (item === 'category' && queryValue[item].code !== '000') {
                 const { code } = queryValue[item];
                 // đối với category thì lấy ra slug để đưa vào params
-                const currentCategory = categories.find((category) => category.code === code);
+                const currentCategory = categories.find(
+                    (category) => category.code === code
+                );
                 if (currentCategory) {
                     params[item] = currentCategory.slug;
                 }
@@ -267,11 +273,12 @@ const Search = () => {
 
         // Định nghĩa options cho router
         let routerOptions: Record<string, any> = {
-            pathname: router.pathname,
+            pathname: '/',
             query: {
                 ...params,
             },
         };
+
         if (params['category']) {
             const { category, ...query } = params;
             routerOptions = {
@@ -350,9 +357,17 @@ const Search = () => {
                                         <SearchModalSlider
                                             key={menu.type}
                                             menu={menu.data as IItemSlider[]}
-                                            data={allValue[menu.type] as IItemSlider}
-                                            handleChangeValue={handleChangeSlider(menu.type)}
-                                            formatNumber={menu.formatNumber as number}
+                                            data={
+                                                allValue[
+                                                    menu.type
+                                                ] as IItemSlider
+                                            }
+                                            handleChangeValue={handleChangeSlider(
+                                                menu.type
+                                            )}
+                                            formatNumber={
+                                                menu.formatNumber as number
+                                            }
                                             prefix={menu.prefix as string}
                                             handleReset={handleReset(menu.type)}
                                         />
